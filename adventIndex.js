@@ -11,74 +11,67 @@ var rl = readline.createInterface({
   output: process.stdout
 });
 
-var lookupTable = mapFunctions(mazeMap);
 var userString;
+var lookupTable = mapFunctions(mazeMap);
 var directionArray = [];
-
 var initRoom = mazeMap.rooms[0];
+var nextRoom,nextDirection,tmp,index,room;
 
-var retrieveDirections = function(roomName) {
 
-	if (roomName.north !== null) {
+var retrieveDirections = function(roomObj) {
+	directionArray = [];
+	if (roomObj.north !== null) {
 		directionArray.push('north');
-	} if(roomName.south !== null) {
+	} if(roomObj.south !== null) {
 		directionArray.push('south')
-	} if (roomName.west !== null) {
+	} if (roomObj.west !== null) { 
 		directionArray.push('west');
-	} if (roomName.east !== null) {
+	} if (roomObj.east !== null) {
 		directionArray.push('east');
 	}
-
+	//remove dupes from array before passing it
 	return directionArray.join(' or ');
 }
 
-
 var init = function() {
+	console.log(comp.createRoom(initRoom));
 	userString = "You are standing in "+initRoom.name;
-	userString += ".\n There is a miniature apple tree here.\n";
+	userString += ".\n"+initRoom.description+"\n";
 	userString += "You can go "+retrieveDirections(initRoom)+".";
-	userString += "\n\nEnter your choice: ";
+	userString += "\n\nEnter your initial choice: ";
 
 	rl.question(userString, function(next) {
-		goOn(next, initRoom.name);
+		goOn(next, initRoom);
 	});
 };
 
-var goOn = function(nextDirection, roomName) {
-
-	for (var key in mazeMap.rooms) {
-		if (mazeMap.rooms[key]['name'] === roomName){
-			var nextRoom = mazeMap.rooms[key][nextDirection];
-			console.log('room: ',nextRoom);
-			console.log(mazeMap.rooms.name[nextRoom]);
-			//console.log(comp.createRoom(mazeMap.rooms.name[nextRoom]));
+var findNameObj = function(roomName) {
+	for (room in mazeMap.rooms) {
+		if(mazeMap.rooms[room]['name'] === roomName) {
+			return mazeMap.rooms[room];
+		}
 	}
 }
+	
+var goOn = function(nextDirection, currentRoom) {
+	//console.log();
+	for (index in mazeMap.rooms) {
+		if (mazeMap.rooms[index]['name'] === currentRoom.name){
+			nextRoom = mazeMap.rooms[index][nextDirection];
+		};
+	};
+	
+	nextRoom = findNameObj(nextRoom);
+	console.log(comp.createRoom(nextRoom));
+	userString = "You are standing in "+nextRoom.name;
+	userString += ".\n"+nextRoom.description+"\n";
+	userString += "You can go "+retrieveDirections(nextRoom)+".";
+	userString += "\n\nEnter your moving on choice: ";
 
-//	var nextRoom = mazeMap.rooms[name];///
-//	console.log(nextRoom);
-
+	rl.question(userString, function(next) {
+		goOn(next, nextRoom);
+	});
 };
 
+
 init();
-// //console.log(comp.createRoom(mazeMap.rooms[0]));
-
-// var userString = "You are standing in "+lookupTable.A.name;
-// userString += ".\n There is a miniature apple tree here.";
-// userString += ".\n You can go ";
-
-// rl.question(userString, function(next){
-// 	console.log(next);
-
-// });
-
-//console.log(comp.createRoom(mazeMap.rooms[mazeMap.rooms.entrance]));
-// rl.question("You are in room A. You can go  ",function(wtf){
-// 	console.log('wtf: ',wtf);
-// });
-// var allRooms = function(mazeMap){
-// 	var tmp = mazeMap.map();
-// 	console.log(tmp);
-// }
-
-//allRooms(mazeMap);
